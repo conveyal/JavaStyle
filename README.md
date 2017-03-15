@@ -29,7 +29,7 @@ We like to move fast and build working prototypes. Functionality is often omitte
 
 Most of our Java projects use the Maven build and dependency management system. We do not use the `maven-release` plugin to perform releases. That plugin requires only non-SNAPSHOT dependencies. Also, we don't want to perform releases from our local machines and prefer to let Travis CI do them. It provides a consistent build environment and there is no risk of stray local commits getting into a release.
 
-However, our manual release process closely mimics what `maven-release` does. Releases must be tagged with git *annotated* commits, not *lightweight* commits. This is because `git describe` references the last annotated commit, and we use git describe as a way of specifying and identifying analyst woker versions. For the R5 project, these annotated tags should systematically begin with the letter v because this is how our scripts recognize shaded JARs named with git describe output as opposed to un-shaded maven artifact JARs. For OpenTripPlanner, these tags should be of the form `otp-1.1.0`. 
+However, our manual release process closely mimics what `maven-release` does. Releases must be tagged with git *annotated* tags, not *lightweight* tags. This is because `git describe` references the last annotated tag, and we use git describe as a way of specifying and identifying analyst woker versions. For the R5 project, these annotated tags should systematically begin with the letter v because this is how our scripts recognize shaded JARs named with git describe output as opposed to un-shaded maven artifact JARs. For OpenTripPlanner, these tags should be of the form `otp-1.1.0`. 
 
 Here is the typical release process:
 ```
