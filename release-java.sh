@@ -2,6 +2,18 @@
 
 # Warn user if not on master branch
 branch=$(git rev-parse --abbrev-ref HEAD)
+# Get version from pom.xml
+echo Checking version number in pom.xml
+version=$(mvn help:evaluate -Dexpression=project.version|grep -Ev '(^\[|Download\w+:)')
+# Check for push to repository
+echo "Version number found in pom is $version. Continue with release? (Y/n)"
+read cont
+if [ "$cont" =  "Y" ]; then
+    continue
+else
+    echo Exiting.
+    exit 0
+fi
 master="master"
 if [ "$branch" = "$master" ]; then
     echo On branch master...
@@ -15,13 +27,7 @@ else
         exit 0
     fi
 fi
-# Exit if no version number provided
-if [[ $# -eq 0 ]] ; then
-    echo 'No version number provided. Please provide version # (e.g., ./release.sh 1.0.2)'
-    exit 0
-fi
 # Parse version number parts
-version=$1
 major=$(echo $version | cut -d. -f1)
 minor=$(echo $version | cut -d. -f2)
 micro=$(echo $version | cut -d. -f3)
@@ -50,10 +56,15 @@ echo "#####################################"
 # Print tag info
 git cat-file tag v$version
 # Check for push to repository
-echo "Would you like to push to remote? (Y/n)"
+echo "Would you like to push to remote? (Y/n/reset)"
 read cont
 if [ "$cont" =  "Y" ]; then
     continue
+elif [ "$cont" = "reset" ]; then
+    git reset --soft HEAD~1
+    git tag -d v$version
+    echo Reset commit and deleted tag v$version
+    exit 0
 else
     echo Exiting.
     exit 0
@@ -62,7 +73,7 @@ fi
 git push origin v$version
 # Print instructions on updating pom to snapshot with new version number
 echo "#####################################"
-echo Please update version in POM to next snapshot, e.g., $new_version-SNAPSHOT. Then run the following command:
+echo "Please update version in POM to next snapshot, e.g., $new_version-SNAPSHOT. Then run the following command:"
 echo "#####################################"
 echo ""
 echo git add pom.xml
