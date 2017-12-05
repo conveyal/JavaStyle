@@ -1,13 +1,14 @@
-# JavaStyle
-Java style guide for all Conveyal Java projects
+# Conveyal Java Code Style Guide
+
+## General
+
+This document contains points we have discussed and decided on within Conveyal. For any point that is not covered by this document, we defer to the Google Java style guide. https://google.github.io/styleguide/javaguide.html
+
+Plase make incremental changes as you go along to bring old code in line with current code standards. However, you should separate those changes out into separate commits that only concern documentation or formatting, that should therefore be no-ops from the compiler's point of view. It is  easier to understand changes to functionality later when they are not mixed with changes to wrapping, brackets, comments etc.
 
 ### Do not use wildcard imports
 
-IntelliJ IDEA adds wildcard imports automatically: 
-
-```
-import com.vividsolutions.jts.geom.*;```
-```
+Unfortunately, by default IntelliJ IDEA aggressively inserts wildcard imports automatically, for example: `import com.vividsolutions.jts.geom.*;`
 
 This is causes namespace pollution and we'd prefer to import only the classes we want to use like so:
 
@@ -24,6 +25,12 @@ In IntelliJ, go to `Editor -> Code Style -> Java` and on the `Imports` tab set "
 ### Throw exceptions or log warnings for unsupported functionality
 
 We like to move fast and build working prototypes. Functionality is often omitted in the interest of carrying out a demonstration or a specific case study on a deadline. When you consciously choose to implement only one code path out of several (*e.g.* considering GTFS calendar dates but not simple calendars because you know your input data contains only the former) always create stubs for the missing functionality which either throw an exception or log at WARN or ERROR level when those code paths are taken. It is all too easy to forget that a particular function is only half-implemented, turning a conscious simplification into a strange bug.
+
+In IntelliJ IDEA you can change default generated method bodies to have the behavior we want. Go to `Preferences -> Editor -> File and Code Templates -> Code tab -> Overridden Method Body`, and set it to `throw new UnsupportedOperationException();`.
+
+### Never silently swallow exceptions
+
+Java's checked exceptions are obnoxious. Frequently while prototyping and building up new code, you just want to let exceptions bubble all the way up and disrupt the application, but you don't want to add `throws VerySpecificCheckedException` to every one of your method signatures all the way up the call stack to the point where you have defined a generic facility for catching and logging unexpected or unhandled problems. Your IDE will auto-insert try-catch blocks, but they often do something close to silently swallowing exceptions: they just log the stack trace to the console and continue execution. In IntelliJ IDEA, you can change the default catch body to rethrow unchecked exceptions. Go to `Preferences -> Editor -> File and Code Templates -> Code tab -> Catch Body` and set it to `throw new RuntimeException(${EXCEPTION});`.
 
 ## Build System
 
@@ -58,4 +65,19 @@ git push
 The CI system will see the pushed commits, build them, and take appropriate steps to deploy the resulting artifacts to the staging repository. If the version number in the POM indicated that the commit is a release, the artifacts should be synced to Maven Central automatically. 
 
 Note that the release must be tagged on the master branch, not a maintenance or feature branch. The maintenance branch for a particular release should be created *after* that release is tagged. This is because git-describe determines the version by tracing back through the history to the most recent tag. A tag on a non-master branch will never be seen.
+
+
+## Comments
+
+### Javadoc Comments
+
+Every public method and public field should have a Javadoc comment. Comments should not be trivial, i.e. should not repeat information visible in the method name and parameter names and types. 
+
+### In-line comments
+
+Always imagine yourself reading a comment a year in the future when you've forgotten this module exists, or think about what it's like reading someone else's code when you have no understanding of that person's thought process. Over the long term, the vast majority of time spent on software is maintenance and operations. Someone will eventually need to reverse-engineer what you've written, and that someone may well be your future self who's completely forgotten this code. If you write the comments as you create the code, it also helps double-check your thinking to have "redundant" versions of the same logic side by side in prose and symbolic form.
+
+So it's completely normal and even desirable to write code that's 50% comments!
+
+Currently for in-line comments we use a mix of end-of-line comments beginning with a double-slash (`//`) and bracketed comments (`/* comment */`). We should settle on some standard for this.
 
