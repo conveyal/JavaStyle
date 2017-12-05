@@ -25,6 +25,14 @@ In IntelliJ, go to `Editor -> Code Style -> Java` and on the `Imports` tab set "
 
 We like to move fast and build working prototypes. Functionality is often omitted in the interest of carrying out a demonstration or a specific case study on a deadline. When you consciously choose to implement only one code path out of several (*e.g.* considering GTFS calendar dates but not simple calendars because you know your input data contains only the former) always create stubs for the missing functionality which either throw an exception or log at WARN or ERROR level when those code paths are taken. It is all too easy to forget that a particular function is only half-implemented, turning a conscious simplification into a strange bug.
 
+## Build System
+
+Build with Maven (just because it's standard and provides zillions of libraries). Maven is very opinionated, and allows you to shoot yourself in the foot. Rather than trying to force it to behave in a certain way, follow its conventions as much as possible. Multi-module builds caused us all sorts of pain with OpenTripPlanner a few years back. Avoid multi-module builds, at least until we can research how they have evolved and matured since that time.
+
+## Continuous integration
+
+We use Travis CI to build every commit that is pushed to our Java repositories. We should document various things about this process, including deployment to Maven central, the fact that certain projects have builds uploaded to S3, our old Conveyal Maven repository.
+
 ## Performing a Release
 
 Most of our Java projects use the Maven build and dependency management system. We do not use the `maven-release` plugin to perform releases. That plugin requires only non-SNAPSHOT dependencies. Also, we don't want to perform releases from our local machines and prefer to let Travis CI do them. It provides a consistent build environment and there is no risk of stray local commits getting into a release.
@@ -50,3 +58,4 @@ git push
 The CI system will see the pushed commits, build them, and take appropriate steps to deploy the resulting artifacts to the staging repository. If the version number in the POM indicated that the commit is a release, the artifacts should be synced to Maven Central automatically. 
 
 Note that the release must be tagged on the master branch, not a maintenance or feature branch. The maintenance branch for a particular release should be created *after* that release is tagged. This is because git-describe determines the version by tracing back through the history to the most recent tag. A tag on a non-master branch will never be seen.
+
