@@ -32,6 +32,10 @@ In IntelliJ IDEA you can change default generated method bodies to have the beha
 
 Java's checked exceptions are obnoxious. Frequently while prototyping and building up new code, you just want to let exceptions bubble all the way up and disrupt the application, but you don't want to add `throws VerySpecificCheckedException` to every one of your method signatures all the way up the call stack to the point where you have defined a generic facility for catching and logging unexpected or unhandled problems. Your IDE will auto-insert try-catch blocks, but they often do something close to silently swallowing exceptions: they just log the stack trace to the console and continue execution. In IntelliJ IDEA, you can change the default catch body to rethrow unchecked exceptions. Go to `Preferences -> Editor -> File and Code Templates -> Code tab -> Catch Body` and set it to `throw new RuntimeException(${EXCEPTION});`.
 
+### Bubble complete exception information up to UIs
+
+When bubbling Exceptions up to UIs, don’t use `exception.getMessage()`. For many exception types this doesn’t return anything useful. For example, for all NullPointerExceptions this will just return `null`. There are three pieces of information we need to facilitate debugging: the exception type, the detail message (if any), and the source code line where it happened (for all stack frames). The simplest thing to do is call `exception.toString()` which will at least get you the exception class and message. But ideally use something like our `ExceptionUtils.asString()` method in R5, which appends a stacktrace to the exception class and detail message.
+
 ## Build System
 
 Build with Maven (just because it's standard and provides zillions of libraries). Maven is very opinionated, and allows you to shoot yourself in the foot. Rather than trying to force it to behave in a certain way, follow its conventions as much as possible. Multi-module builds caused us all sorts of pain with OpenTripPlanner a few years back. Avoid multi-module builds, at least until we can research how they have evolved and matured since that time.
