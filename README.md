@@ -36,6 +36,18 @@ Java's checked exceptions are obnoxious. Frequently while prototyping and buildi
 
 When bubbling Exceptions up to UIs, don’t use `exception.getMessage()`. For many exception types this doesn’t return anything useful. For example, for all NullPointerExceptions this will just return `null`. There are three pieces of information we need to facilitate debugging: the exception type, the detail message (if any), and the source code line where it happened (for all stack frames). The simplest thing to do is call `exception.toString()` which will at least get you the exception class and message. But ideally use something like our `ExceptionUtils.asString()` method in R5, which appends a stacktrace to the exception class and detail message.
 
+### Units and Symbolic Constants
+
+Always suffix the names of numeric variables with the units in which they are expressed. Always use symbolic constants for numbers included in expressions unless the source and meaning of the number is completely obvious.
+
+```
+int distanceMillimeters = distanceMeters * 1000; // OK
+int durationMinutes = durationHours * 60; // OK, but still could use a symbolic constant
+
+public static final int METERS_PER_FURLONG = 201.168;
+double distanceMeters = distanceFurlongs * METERS_PER_FURLONG; // The best way
+```
+
 ## Build System
 
 Build with Maven (just because it's standard and provides zillions of libraries). Maven is very opinionated, and allows you to shoot yourself in the foot. Rather than trying to force it to behave in a certain way, follow its conventions as much as possible. Multi-module builds caused us all sorts of pain with OpenTripPlanner a few years back. Avoid multi-module builds, at least until we can research how they have evolved and matured since that time.
