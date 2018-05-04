@@ -38,14 +38,15 @@ When bubbling Exceptions up to UIs, don’t use `exception.getMessage()`. For ma
 
 ### Units and Symbolic Constants
 
-Always suffix the names of numeric variables with the units in which they are expressed. Always use symbolic constants for numbers included in expressions unless the source and meaning of the number is completely obvious.
+Always suffix the names of numeric variables with the units in which they are expressed. Always use symbolic constants for numbers included in expressions unless the source and meaning of the number is completely obvious. Numeric constants in Java can have underscores in them to group thousands. Use this for numbers over 1000. This makes it easier to visually sanity check the magnitude of the constant.
 
 ```
 int distanceMillimeters = distanceMeters * 1000; // OK
 int durationMinutes = durationHours * 60; // OK, but still could use a symbolic constant
 
+public static final EARTH_CIRCUMFERENCE_METERS = 40_075_017;
 public static final int METERS_PER_FURLONG = 201.168;
-double distanceMeters = distanceFurlongs * METERS_PER_FURLONG; // The best way
+double distanceMeters = EARTH_CIRCUMFERENCE_METERS / METERS_PER_FURLONG; // The best way
 ```
 
 ## Build System
